@@ -15,7 +15,7 @@ public class FareCalculatorService {
 
         //TODO: Some tests are failing here. Need to check if this logic is correct
         float duration = (float)(outHour - inHour)/1000/3600;
-
+        
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
                 ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
@@ -27,5 +27,10 @@ public class FareCalculatorService {
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
         }
+        
+        if (duration < 0.5){
+            ticket.setPrice(0);
+        }
+        
     }
 }
