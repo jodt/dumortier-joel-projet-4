@@ -45,7 +45,7 @@ public class ParkingService {
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
                 ticketDAO.saveTicket(ticket);
-                if (ticketDAO.getNbTicket(vehicleRegNumber) > 1){
+                if (isEligibleDiscount(vehicleRegNumber)){
                     System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
                 }
                 System.out.println("Generated Ticket and saved in DB");
@@ -106,7 +106,7 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
-            if (ticketDAO.getNbTicket(vehicleRegNumber) > 1){
+            if (isEligibleDiscount(vehicleRegNumber)){
                 fareCalculatorService.calculateFare(ticket, true);
             } else {
                 fareCalculatorService.calculateFare(ticket);
@@ -123,5 +123,15 @@ public class ParkingService {
         }catch(Exception e){
             logger.error("Unable to process exiting vehicle",e);
         }
+    }
+
+    /**
+    *check if eligible for a discount
+    *
+    *@Param String vehicle identification
+    *@Return true if vehicle is eligible for a discount or false
+    */
+    private boolean isEligibleDiscount(String vehicleRegNumber){
+        return ticketDAO.getNbTicket(vehicleRegNumber) > 1;
     }
 }
