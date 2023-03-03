@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
+import java.util.Random;
 
 import static org.mockito.Mockito.*;
 
@@ -53,9 +54,19 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void processExitingVehicleTest(){
+    public void processExitingVehicleTestWithoutDiscount(){
+        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(0);
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.times(1)).getNbTicket("ABCDEF");
+    }
+
+    @Test
+    public void processExitingVehicleTestWithDiscount(){
+        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(5);
+        parkingService.processExitingVehicle();
+        verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.times(1)).getNbTicket("ABCDEF");
     }
 
 }
