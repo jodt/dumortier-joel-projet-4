@@ -100,9 +100,9 @@ public class TicketDAO {
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
-        } catch (Exception ex) {
+        }catch (Exception ex) {
             logger.error("Error retrieving number of tickets",ex);
-        } finally {
+        }finally {
             dataBaseConfig.closeConnection(con);
             return nbTicket;
         }
