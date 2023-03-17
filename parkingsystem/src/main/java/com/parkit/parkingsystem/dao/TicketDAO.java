@@ -124,4 +124,25 @@ public class TicketDAO {
             return nbTicket;
         }
     }
+
+    public boolean isAlreadyInParking(String vehicleRegNumber){
+        Connection con = null;
+        boolean isInParking = false;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_ALREADY_IN_PARKING);
+            ps.setString(1, vehicleRegNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                isInParking = true;
+            }
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        }catch (Exception ex) {
+            logger.error("Error retrieving number of tickets",ex);
+        }finally {
+            dataBaseConfig.closeConnection(con);
+            return isInParking;
+        }
+    }
 }
