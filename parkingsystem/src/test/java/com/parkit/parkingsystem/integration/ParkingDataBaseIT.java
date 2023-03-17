@@ -89,11 +89,11 @@ public class ParkingDataBaseIT {
         ticket1.setInTime(new Date(ticketDAO.getTicket("ABCDEF").getInTime().getTime() - (60*60*1000)));
         ticketDAO.updateTicketIntime(ticket1);
         parkingService.processExitingVehicle();
-        Thread.sleep(1000);
         parkingService.processIncomingVehicle();
         Ticket ticket2 = ticketDAO.getTicket("ABCDEF");
         ticket2.setInTime(new Date(ticketDAO.getTicket("ABCDEF").getInTime().getTime() - (30*60*1000)));
         ticketDAO.updateTicketIntime(ticket2);
+        Thread.sleep(500);
         parkingService.processExitingVehicle();
         BigDecimal expectedPrice = BigDecimal.valueOf((30/(double)60) * Fare.CAR_RATE_PER_HOUR * 0.95).setScale(2, RoundingMode.CEILING);
         BigDecimal ticketPrice = BigDecimal.valueOf(ticketDAO.getTicket("ABCDEF").getPrice()).setScale(2, RoundingMode.CEILING);
