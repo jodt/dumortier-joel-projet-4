@@ -109,6 +109,10 @@ public class ParkingService {
     public void processExitingVehicle() {
         try{
             String vehicleRegNumber = getVehichleRegNumber();
+            while(!ticketDAO.isAlreadyInParking(vehicleRegNumber)){
+                System.out.println("Ce véhicule n'est pas dans le parking");
+                return;
+                };
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
