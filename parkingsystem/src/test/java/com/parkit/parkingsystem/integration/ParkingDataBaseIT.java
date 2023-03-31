@@ -78,6 +78,7 @@ public class ParkingDataBaseIT {
         Thread.sleep(1000);
         //TODO: check that the fare generated and out time are populated correctly in the database
         assertEquals(0, ticketDAO.getTicket("ABCDEF").getPrice());
+        assertTrue(ticketDAO.getTicket("ABCDEF").getOutTime().getTime() > ticketDAO.getTicket("ABCDEF").getInTime().getTime());
         assertNotNull(ticketDAO.getTicket("ABCDEF").getOutTime());
     }
 
@@ -95,8 +96,8 @@ public class ParkingDataBaseIT {
         ticketDAO.updateTicketIntime(ticket2);
         Thread.sleep(500);
         parkingService.processExitingVehicle();
-        BigDecimal expectedPrice = BigDecimal.valueOf((30/(double)60) * Fare.CAR_RATE_PER_HOUR * 0.95).setScale(2, RoundingMode.CEILING);
-        BigDecimal ticketPrice = BigDecimal.valueOf(ticketDAO.getTicket("ABCDEF").getPrice()).setScale(2, RoundingMode.CEILING);
+        BigDecimal expectedPrice = BigDecimal.valueOf((30/(double)60) * Fare.CAR_RATE_PER_HOUR * 0.95).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal ticketPrice = BigDecimal.valueOf(ticketDAO.getTicket("ABCDEF").getPrice()).setScale(2, RoundingMode.HALF_UP);
         assertEquals(expectedPrice,ticketPrice); 
     }
 }
