@@ -139,7 +139,7 @@ public class TicketDAO {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
         }catch (Exception ex) {
-            logger.error("Error retrieving number of tickets",ex);
+            logger.error("Error retrieving information if already parked",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
             return isInParking;
