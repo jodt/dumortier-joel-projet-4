@@ -7,6 +7,7 @@ import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
+import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -131,7 +132,7 @@ public class ParkingServiceTest {
         parkingService.processExitingVehicle();
 
         verify(inputReaderUtil, times(1)).readVehicleRegistrationNumber();
-        verify(ticketDAO, Mockito.times(1)).getTicket(anyString());
+        verify(ticketDAO, Mockito.times(1)).getTicket("ABCDEF");
         verify(ticketDAO, Mockito.times(1)).updateTicket(ticketCaptor.capture());
         verify(parkingSpotDAO, Mockito.never()).updateParking(any(ParkingSpot.class));
         verify(ticketDAO, Mockito.times(1)).getNbTicket("ABCDEF");
@@ -139,6 +140,21 @@ public class ParkingServiceTest {
         Ticket ticketCaptorValue = ticketCaptor.getValue();
         assertFalse(ticketCaptorValue.getParkingSpot().isAvailable());
         assertTrue(outputStreamCaptor.toString().trim().contains("Unable to update ticket information. Error occurred"));
+    }
+
+    @Test
+    public void processExitingIfVehicleIsNotParked() throws Exception {
+        when(ticketDAO.isAlreadyInParking(anyString())).thenReturn(false);
+
+        parkingService.processExitingVehicle();
+
+        verify(inputReaderUtil, times(1)).readVehicleRegistrationNumber();
+        verify(ticketDAO, Mockito.never()).getTicket("ABCDEF");
+        verify(ticketDAO, Mockito.never()).updateTicket(any(Ticket.class));
+        verify(parkingSpotDAO, Mockito.never()).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.never()).getNbTicket("ABCDEF");
+
+        assertTrue(outputStreamCaptor.toString().trim().contains("Ce véhicule n'est pas dans le parking"));
     }
 
     //Tests for processIncomingVehicle
@@ -167,6 +183,7 @@ public class ParkingServiceTest {
         assertNotNull(ticketCaptorValue.getInTime());
         assertNull(ticketCaptorValue.getOutTime());
         assertEquals(0, ticketCaptorValue.getPrice());
+        assertFalse(outputStreamCaptor.toString().trim().contains("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%"));
     }
 
     @Test
@@ -193,6 +210,7 @@ public class ParkingServiceTest {
         assertNotNull(ticketCaptorValue.getInTime());
         assertNull(ticketCaptorValue.getOutTime());
         assertEquals(0, ticketCaptorValue.getPrice());
+        assertTrue(outputStreamCaptor.toString().trim().contains("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%"));
     }
 
     @Test
@@ -219,6 +237,7 @@ public class ParkingServiceTest {
         assertNotNull(ticketCaptorValue.getInTime());
         assertNull(ticketCaptorValue.getOutTime());
         assertEquals(0, ticketCaptorValue.getPrice());
+        assertFalse(outputStreamCaptor.toString().trim().contains("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%"));
     }
 
     @Test
@@ -245,6 +264,41 @@ public class ParkingServiceTest {
         assertNotNull(ticketCaptorValue.getInTime());
         assertNull(ticketCaptorValue.getOutTime());
         assertEquals(0, ticketCaptorValue.getPrice());
+        assertTrue(outputStreamCaptor.toString().trim().contains("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%"));
+    }
+
+    @Test
+    public void testProcessIncomingIfCarIsAlreadyInParking() throws Exception {
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+        when(ticketDAO.isAlreadyInParking(anyString())).thenReturn(true);
+        
+        parkingService.processIncomingVehicle();
+
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(ParkingType.CAR);
+        verify(inputReaderUtil, Mockito.times(1)).readVehicleRegistrationNumber();
+        verify(parkingSpotDAO, Mockito.never()).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.never()).saveTicket(any(Ticket.class));
+
+        assertTrue(outputStreamCaptor.toString().trim().contains("Le véhicule est déjà dans le parking"));
+    }
+
+    @Test
+    public void testProcessIncomingIfBikeIsAlreadyInParking() throws Exception {
+        when(inputReaderUtil.readSelection()).thenReturn(2);
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+        when(ticketDAO.isAlreadyInParking(anyString())).thenReturn(true);
+        
+        parkingService.processIncomingVehicle();
+
+        verify(inputReaderUtil, Mockito.times(1)).readSelection();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(ParkingType.BIKE);
+        verify(inputReaderUtil, Mockito.times(1)).readVehicleRegistrationNumber();
+        verify(parkingSpotDAO, Mockito.never()).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO, Mockito.never()).saveTicket(any(Ticket.class));
+
+        assertTrue(outputStreamCaptor.toString().trim().contains("Le véhicule est déjà dans le parking"));
     }
 
     @Test
