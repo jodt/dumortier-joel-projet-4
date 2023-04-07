@@ -13,7 +13,7 @@ public class DataBaseConfig {
         logger.info("Create DB connection");
         Class.forName("com.mysql.cj.jdbc.Driver");
         return DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/test?serverTimezone=UTC&enabledTLSProtocols=TLSv1.2","root","codio");
+                "jdbc:mysql://localhost:3306/prod?serverTimezone=UTC&enabledTLSProtocols=TLSv1.2","root","codio");
     }
 
     public void closeConnection(Connection con){
