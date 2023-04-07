@@ -13,7 +13,6 @@ public class FareCalculatorService {
         long inHour = ticket.getInTime().getTime();
         long outHour = ticket.getOutTime().getTime();
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
         float duration = (float)(outHour - inHour)/1000/3600;
         
         switch (ticket.getParkingSpot().getParkingType()){

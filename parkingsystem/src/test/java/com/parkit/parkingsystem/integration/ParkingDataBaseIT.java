@@ -61,7 +61,6 @@ public class ParkingDataBaseIT {
     public void testParkingACar(){
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
-        //TODO: check that a ticket is actualy saved in DB and Parking table is updated with availability
         assertNotNull(ticketDAO.getTicket("ABCDEF"));
         assertEquals("ABCDEF", ticketDAO.getTicket("ABCDEF").getVehicleRegNumber());
         assertEquals(0, ticketDAO.getTicket("ABCDEF").getPrice());
@@ -76,7 +75,6 @@ public class ParkingDataBaseIT {
         Thread.sleep(1000);
         parkingService.processExitingVehicle();
         Thread.sleep(1000);
-        //TODO: check that the fare generated and out time are populated correctly in the database
         assertEquals(0, ticketDAO.getTicket("ABCDEF").getPrice());
         assertTrue(ticketDAO.getTicket("ABCDEF").getOutTime().getTime() > ticketDAO.getTicket("ABCDEF").getInTime().getTime());
         assertNotNull(ticketDAO.getTicket("ABCDEF").getOutTime());
